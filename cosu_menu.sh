@@ -1,16 +1,16 @@
 ####################################################################################
 # Copyright (c) 2019 - Present Crestron Electronics, Inc.
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,7 +22,7 @@
 
 
 #!/bin/bash
-# A menu driven shell script sample template 
+# A menu driven shell script sample template
 ## ----------------------------------
 # Step #1: Define variables
 # ----------------------------------
@@ -30,7 +30,7 @@ EDITOR=vim
 PASSWD=/etc/passwd
 RED='\033[0;41;30m'
 STD='\033[0;0;39m'
- 
+
 # ----------------------------------
 # Step #2: User defined function
 # ----------------------------------
@@ -38,14 +38,14 @@ pause(){
   read -p "Press [Enter] key to continue..." fackEnterKey
 }
 
- 
+
 # function to display menus
 show_menus() {
 	if ! $debug; then
 		clear
 	fi
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~"	
-	echo " Crestron OpenSSL Utility"
+	echo "~~~~~~~~~~~~~~~~~~~~~~~~~"
+	echo " Crestron openssl.exe Utility"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "1. Create New Root Certificate"
 	echo "2. Create New Intermediate Certificate"
@@ -73,19 +73,19 @@ read_options(){
 		*) echo -e "${RED}Error...${STD}" && sleep 1
 	esac
 }
- 
+
 run(){
 	# ----------------------------------------------
 	# Step #3: Trap CTRL+C, CTRL+Z and quit singles
 	# ----------------------------------------------
 	trap '' SIGINT SIGQUIT SIGTSTP
-	
+
 	# -----------------------------------
 	# Step #4: Main logic - infinite loop
 	# ------------------------------------
 	while true
 	do
-	
+
 		show_menus
 		read_options
 		pause

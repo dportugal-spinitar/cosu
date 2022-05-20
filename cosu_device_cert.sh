@@ -1,16 +1,16 @@
 ####################################################################################
 # Copyright (c) 2019 - Present Crestron Electronics, Inc.
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,47 +29,47 @@ write_device_cert_config(){
 # The other important part is the Subject Alt Name (SAN) is written out for the device as well
 cat > $device_folder/ssl.cnf << EOL
 [ ca ]
-default_ca = CA_default 
-[CA_default] 
-default_md = $sslsha 
+default_ca = CA_default
+[CA_default]
+default_md = $sslsha
 database          = $signer_folder/index.txt
 serial            = $signer_folder/serial
-policy            = policy_loose 
-[ policy_loose ] 
+policy            = policy_loose
+[ policy_loose ]
 # Allow the intermediate CA to sign a more diverse range of certificates
-# See the POLICY FORMAT section of man ca. 
-countryName             = optional 
-stateOrProvinceName     = optional 
-organizationName        = optional 
-organizationalUnitName  = optional 
-commonName              = supplied 
-emailAddress            = optional 
-[ req ] 
-# Options for the req tool (man req). 
+# See the POLICY FORMAT section of man ca.
+countryName             = optional
+stateOrProvinceName     = optional
+organizationName        = optional
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+[ req ]
+# Options for the req tool (man req).
 prompt              = no
-default_bits        = 2048 
-distinguished_name  = req_distinguished_name 
-string_mask         = utf8only 
-[ req_distinguished_name ] 
-C = $ssldef_country 
+default_bits        = 2048
+distinguished_name  = req_distinguished_name
+string_mask         = utf8only
+[ req_distinguished_name ]
+C = $ssldef_country
 ST = $ssldef_state
-L = $ssldef_locality 
+L = $ssldef_locality
 O = $ssldef_org
-#OU = $ssldef_org_unit 
+#OU = $ssldef_org_unit
 CN = $ssldef_device_hostname
-#emailAddress = $ssldef_email 
-[server_cert] 
-# Extensions for server certs(man x509v3_config). 
-subjectKeyIdentifier = hash 
-authorityKeyIdentifier = keyid:always,issuer 
+#emailAddress = $ssldef_email
+[server_cert]
+# Extensions for server certs(man x509v3_config).
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
 basicConstraints = CA:FALSE
 keyUsage = critical, digitalSignature, keyEncipherment
 nsCertType = server
-nsComment = "OpenSSL Generated Server Certificate"
+nsComment = "openssl.exe Generated Server Certificate"
 extendedKeyUsage = serverAuth
 EOL
 
-if valid_ip $ssldef_device_ip; then 
+if valid_ip $ssldef_device_ip; then
     cat >> $device_folder/ssl.cnf << EOL
 subjectAltName = DNS:$ssldef_device_hostname, IP:$ssldef_device_ip
 EOL
@@ -84,7 +84,7 @@ fi
 ##############################################################################################
 view_device_cert(){
 # Allows you to view all the fields in the certificate
-openssl x509 -noout -text -in $device_folder/cert.pem
+openssl.exe x509 -noout -text -in $device_folder/cert.pem
 }
 
 ##############################################################################################
@@ -93,7 +93,7 @@ copy_output(){
 # This includes all the various formats and instructions for device types
     echo "Now copying files for Crestron Device Deployment"
 
-    if test ! -d $deploy_folder; then 
+    if test ! -d $deploy_folder; then
         mkdir $deploy_folder
     fi
 
@@ -114,11 +114,11 @@ copy_output(){
     #cp $signer_folder/chain.pem $device_deploy_folder/chain.cer
 
     #unencrypt and rename the private key
-    openssl rsa -passin pass:$device_password -in $device_folder/key.pem -out $device_deploy_folder/srv_key.pem
+    openssl.exe rsa -passin pass:$device_password -in $device_folder/key.pem -out $device_deploy_folder/srv_key.pem
 
     #create a PFX File
-    openssl pkcs12 -export -passin pass:$device_password -passout pass:$device_password -out $device_deploy_folder/webserver_cert.pfx -inkey $device_folder/key.pem -in $device_folder/cert.pem
-   
+    openssl.exe pkcs12 -export -passin pass:$device_password -passout pass:$device_password -out $device_deploy_folder/webserver_cert.pfx -inkey $device_folder/key.pem -in $device_folder/cert.pem
+
     #write out the user instructions
     cat > $device_deploy_folder/readme.txt << EOL
 
@@ -128,7 +128,7 @@ rootCA_cert.cer may be added to your local certificate store as a trusted certif
 ***** 3 Series Instructions
 ***** Firmware 1.601 or higher!!
 **********************************************
-Please place rootCA_cert.cer, intermediate_cert.cer, 
+Please place rootCA_cert.cer, intermediate_cert.cer,
 srv_cert.cer and srv_key.pem
 into the control system \User folder using SFTP
 
@@ -146,7 +146,7 @@ Execute the following commands
 >move User\srv_cert.cer \sys
 >move User\srv_key.pem \sys
 
->ssl ca 
+>ssl ca
 
 **********************************************
 ***** 4 Series Instructions
@@ -160,7 +160,7 @@ Execute the following commands
 >move sys\intermediate_cert.cer \romdisk\user\cert
 
 >certificate add intermediate
->ssl ca 
+>ssl ca
 
 
 **********************************************
@@ -173,24 +173,24 @@ into the /User/Cert folder using SFTP (first remove any root_cert.cer that might
 >certificate add root
 >certificate add intermediate
 >certificate add webserver <password>
->ssl ca 
+>ssl ca
 
 EOL
-  
+
 }
 
 
 #######################################################################################################
-gen_device_cert(){    
+gen_device_cert(){
 # Creates a certificate based on the various environment variables and copies to the output folder
 # assumes we already have a CSR as well
     setup_device
     write_device_cert_config
-   
+
     echo "Creating Certificate..."
-    openssl ca -batch -passin pass:$signer_password -config $device_folder/ssl.cnf -cert $signer_folder/cert.pem -keyfile $signer_folder/key.pem -outdir $device_folder -extensions server_cert -days $sslsrvdays -notext -md $sslsha -in $device_folder/csr.pem -out $device_folder/cert.pem
+    openssl.exe ca -batch -passin pass:$signer_password -config $device_folder/ssl.cnf -cert $signer_folder/cert.pem -keyfile $signer_folder/key.pem -outdir $device_folder -extensions server_cert -days $sslsrvdays -notext -md $sslsha -in $device_folder/csr.pem -out $device_folder/cert.pem
     echo "Done"
-    
+
     copy_output
 
 }
@@ -200,22 +200,22 @@ gen_device_cert(){
 interactive_gen_device_cert(){
 # Creates a certificate based on the various environment variables and copies to the output folder
 # This allows you to enter the signing key password and generate the certificate
-    
+
     echo Ready to sign the device certificate
     read -sp "Please enter the Signing key password: " signer_password
 
     gen_device_cert
 
     signer_password=""
-   
-    openssl verify -CAfile $signer_folder/chain.pem $device_folder/cert.pem
+
+    openssl.exe verify -CAfile $signer_folder/chain.pem $device_folder/cert.pem
 
     read -p "Would you like to view the certificate [y/n]: " choice
-    
+
 	case $choice in
 		y) view_device_cert ;;
 		n) ;;
 		*) echo -e "${RED}Error...${STD}" && sleep 2
-	esac  
+	esac
 
 }
